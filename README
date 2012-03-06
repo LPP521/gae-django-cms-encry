@@ -1,0 +1,24 @@
+将gae-django-cms 网页文件加密
+
+环境：在Google App Engine下使用gae-django-cms  搭建的CMS
+目的 : 加密HTML网页文件，使之可以在浏览器中正常显示，但是查看HTML文件时，显示乱码。
+方式：将源生成的数据（html) 在服务器端用python加密，然后再在浏览器端用javascript解密
+加解密算法，从http://www.aspxhome.com/javascript/program/20103/1284528.htm 这里获得，其原理我不懂，本人只是将js代码移植为py代码
+耗时：4-5小时
+日期：2012年3月  (5日-6日)
+
+步骤：
+1. 将 encry.js       文件拷贝到 gae-django-cms-v2.01\media\js   目录
+2. 将 js_encry.py 文件拷贝到 gae-django-cms-v2.01\common\appenginepatch\ragendja  目录
+3. 修改 gae-django-cms-v2.01\common\appenginepatch\ragendja\template.py 文件
+   1). 在文件头添加一行 import js_encry
+   2). 修改 函数 render_to_string 
+       #下面是原来的函数
+        def render_to_string(request, template_name, data=None):
+           return loader.render_to_string(template_name, data, context_instance=RequestContext(request))
+
+       #应修改为
+        def render_to_string(request, template_name, data=None):
+            return ("<script src='/media/js/encry.js'></script><script>document.onLoad=show('%s');</script>" % js_encry.s52e(loader.render_to_string(template_name,data,context_instance=RequestContext(request))))
+
+
